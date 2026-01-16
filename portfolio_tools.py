@@ -55,15 +55,19 @@ def calculate_optimal_portfolio(returns, risk_free_rate):
     Calculate optimal portfolio weights that maximize Sharpe ratio.
     
     Parameters:
-    - returns: DataFrame of asset returns
+    - returns: DataFrame of daily returns
     - risk_free_rate: Annual risk-free rate (e.g., 0.05 for 5%)
     
     Returns:
     - Dictionary with optimal weights, return, volatility, and Sharpe ratio
     """
-    def neg_sharpe_ratio(weights, returns, risk_free_rate):
-        portfolio_return = np.sum(returns.mean() * weights)
-        portfolio_std_dev = np.sqrt(np.dot(weights.T, np.dot(returns.cov(), weights)))
+    # Annualize returns and covariance for consistent calculations
+    annual_returns = returns.mean() * 252
+    annual_cov = returns.cov() * 252
+    
+    def neg_sharpe_ratio(weights, annual_returns, annual_cov, risk_free_rate):
+        portfolio_return = np.sum(annual_returns * weights)
+        portfolio_std_dev = np.sqrt(np.dot(weights.T, np.dot(annual_cov, weights)))
         sharpe = (portfolio_return - risk_free_rate) / portfolio_std_dev
         return -sharpe
     
@@ -75,15 +79,15 @@ def calculate_optimal_portfolio(returns, risk_free_rate):
     optimized_results = minimize(
         neg_sharpe_ratio, 
         initial_weights, 
-        args=(returns, risk_free_rate),
+        args=(annual_returns, annual_cov, risk_free_rate),
         method='SLSQP', 
         bounds=bounds, 
         constraints=constraints
     )
     
     optimal_weights = optimized_results.x
-    optimal_portfolio_return = np.sum(returns.mean() * optimal_weights) * 252
-    optimal_portfolio_std_dev = np.sqrt(np.dot(optimal_weights.T, np.dot(returns.cov() * 252, optimal_weights)))
+    optimal_portfolio_return = np.sum(annual_returns * optimal_weights)
+    optimal_portfolio_std_dev = np.sqrt(np.dot(optimal_weights.T, np.dot(annual_cov, optimal_weights)))
     max_sharpe_ratio = (optimal_portfolio_return - risk_free_rate) / optimal_portfolio_std_dev
     
     # Create weights dictionary
