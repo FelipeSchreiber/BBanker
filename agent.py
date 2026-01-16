@@ -2,12 +2,12 @@ import os
 import gradio as gr
 from openai import AzureOpenAI
 
-endpoint = "https://bbanker-foundry.cognitiveservices.azure.com/"
-model_name = "gpt-5-nano"
-deployment = "gpt-5-nano"
+endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+model_name = os.getenv("AZURE_OPENAI_MODEL_NAME")
+deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", model_name)
 
 subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
-api_version = "2024-12-01-preview"
+api_version = os.getenv("AZURE_OPENAI_API_VERSION")
 
 client = AzureOpenAI(
     api_version=api_version,

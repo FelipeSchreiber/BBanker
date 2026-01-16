@@ -6,3 +6,5 @@ scipy
 matplotlib
 odfpy
 pillow
+yfinance
+openpyxl

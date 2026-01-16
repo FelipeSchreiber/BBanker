@@ -1,0 +1,5 @@
+*.ods
+generate_sample_data.py
+.env
+.venv/
+__pycache__/

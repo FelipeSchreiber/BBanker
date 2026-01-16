@@ -40,10 +40,12 @@ def load_returns_from_file(file_path, sheet_name=None):
     # Get returns (all columns except first which is dates)
     returns = returns_df.iloc[:, 1:].copy()
     
-    # Replace commas with periods and convert to float
-    for col in returns.columns:
-        returns.loc[:, col] = returns.loc[:, col].astype(str).str.replace(',', '.')
-    returns = returns.apply(pd.to_numeric, errors='coerce')
+    # Check if dataframe is already in float format, if not convert it
+    if not all(returns.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
+        # Replace commas with periods and convert to float
+        for col in returns.columns:
+            returns.loc[:, col] = returns.loc[:, col].astype(str).str.replace(',', '.')
+        returns = returns.apply(pd.to_numeric, errors='coerce')
     
     return returns
 
