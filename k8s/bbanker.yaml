@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bbanker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bbanker
+  template:
+    metadata:
+      labels:
+        app: bbanker
+    spec:
+      containers:
+        - name: bbanker
+          image: bbankeracr6cb8b7.azurecr.io/bbanker:latest
+          ports:
+            - containerPort: 7860
+          envFrom:
+            - secretRef:
+                name: bbanker-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bbanker
+spec:
+  type: LoadBalancer
+  selector:
+    app: bbanker
+  ports:
+    - port: 80
+      targetPort: 7860
+      protocol: TCP
